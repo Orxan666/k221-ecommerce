@@ -15,22 +15,39 @@ def contact(request):
 
 @login_required
 def basket(request):
-    basketlist=request.user.customer.basketlist.all().annotate(total_price=F('count')*F('product__price'))
+    basketlist=request.user.customer.basketlist.all().annotate(total_price=F('count')*F('product__price')) 
+
     return render(request,'basket.html',{
-        'basketlist':basketlist
+        'basketlist':basketlist,
+
     })
 
 
-def add_basket(request,product_pk):
-    if request.method=='POST':
-        size_pk=request.POST.get('size')
-        color_pk=request.POST.get('color')
-        count=request.POST.get('count')
-        customer=request.user.customer
-        basket=BasketItem.objects.create(product_id=product_pk, size_id=size_pk, color_id=color_pk,count=count,customer=customer)
+from django.shortcuts import get_object_or_404
+
+def add_basket(request, product_pk):
+    if request.method == 'POST':
+        size_pk = request.POST.get('size')
+        color_pk = request.POST.get('color')
+        count = request.POST.get('count')
+        customer = request.user.customer
+
+        existing_item = BasketItem.objects.filter(
+            product_id=product_pk, size_id=size_pk, color_id=color_pk, customer=customer
+        ).first()
+
+        if existing_item:
+            existing_item.count = F('count') + int(count)
+            existing_item.save()
+        else:
+            BasketItem.objects.create(
+                product_id=product_pk, size_id=size_pk, color_id=color_pk, count=count, customer=customer
+            )
+
         return redirect(request.META.get('HTTP_REFERER'))
     else:
         return redirect('shop:home')
+
 
 
 def increase_basket_item(request,basket_pk):
@@ -58,7 +75,7 @@ def remove_basket(request,basket_pk):
 def wishlist_view(request):
 
     wishlist=request.user.customer.wishlist.all()
-    total_price=wishlist.aggregate(total_price=Sum('product__price'))['total_price']
+    total_price=wishlist.aggregate(total_price=Sum('product__price'))['total_price'] or 0
 
     return render(request,'wishlist.html',{
         'wishlist':wishlist,

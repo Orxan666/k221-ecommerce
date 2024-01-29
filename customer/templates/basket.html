@@ -45,19 +45,23 @@
                             <td class="align-middle"><img src="{{basket.product.images.first.image.url}}" alt="" style="width: 50px;"> {{basket.product.title}}</td>
                             <td class="align-middle">AZN{{basket.product.price}}</td>
                             <td class="align-middle">
-                                <div class="input-group quantity mx-auto" style="width: 100px;" >
-                                    <div class="input-group-btn">
-                                        <a href="{% url 'customer:decrease-basket-item' basket_pk=basket.pk %}" class="btn btn-sm btn-primary btn-minus">
-                                        <i class="fa fa-minus"></i>
-                                        </a>
+                                <td class="align-middle">
+                                    <div class="input-group quantity mx-auto" style="width: 100px;">
+                                        <div class="input-group-btn">
+                                              <a href="{% url 'customer:decrease-basket-item' basket_pk=basket.pk %}" class="btn btn-sm btn-primary btn-minus">
+          
+                                            <i class="fa fa-minus"></i>
+                                              </a>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center" value={{basket.count}} name="count" value="1">
+                                        <div class="input-group-btn">
+                                          <a href="{% url 'customer:increase-basket-item' basket_pk=basket.pk %}" class="btn btn-sm btn-primary btn-minus">
+          
+                                              <i class="fa fa-plus"></i>
+                                                </a>
+                                        </div>
                                     </div>
-                                    <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center" value="{{basket.count}}">
-                                    <div class="input-group-btn">
-                                        <a href="{% url 'customer:increase-basket-item' basket_pk=basket.pk %}" class="btn btn-sm btn-primary btn-plus">
-                                            <i class="fa fa-plus"></i>
-                                        </a>
-                                    </div>
-                                </div>
+                                </td>
                             </td>
                             <td class="align-middle">AZN{{basket.total_price}}</td>
                             <td class="align-middle"><a href="{% url 'customer:remove-basket' basket_pk=basket.pk  %}" class="btn btn-sm btn-danger"><i class="fa fa-times"></i></a></td>
@@ -67,6 +71,7 @@
                     </tbody>
                 </table>
             </div>
+            
             <div class="col-lg-4">
                 <form class="mb-30" action="">
                     <div class="input-group">
@@ -91,7 +96,7 @@
                     <div class="pt-2">
                         <div class="d-flex justify-content-between mt-2">
                             <h5>Total</h5>
-                            <h5>$160</h5>
+                            <h5>AZN{{total_price}}</h5>
                         </div>
                         <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">Proceed To Checkout</button>
                     </div>

@@ -35,3 +35,11 @@ def is_wished(product,request):
     if not request.user.is_authenticated:
         return False
     return WishItem.objects.filter(product=product,customer=request.user.customer).exists()
+
+
+# @register.simple_tag
+
+# def get_params(request,key,value):
+#     querydict=request.GET.copy()
+#     querydict[key]=value
+

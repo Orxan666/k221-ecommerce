@@ -10,7 +10,7 @@ from customer.models import Review
 class ProductImageInline(admin.TabularInline):
     model=ProductImage
     readonly_fields=['image_tag']
-    extra=1
+    extra=1 
 
 class ReviewInline(admin.TabularInline):
     model=Review
