@@ -1,11 +1,11 @@
 from django.shortcuts import render,get_object_or_404,HttpResponse
 
 from django.shortcuts import render,redirect
-from django.db.models import Count
-from .models import Campaign,Category,Product
+from django.db.models import Count,Avg
+from .models import Campaign,Category,Product,Color,Size
 from customer.models import Review
-from django.core.paginator import Paginator
-
+from django.core.paginator import Paginator,EmptyPage
+from .filters import ProductFilter
 # Create your views here.
 
 
@@ -27,16 +27,42 @@ def home(request):
 
 
 def product_list(request):
-    products=Product.objects.all()
-    page_input=request.GET.get('page',1)
-    paginator=Paginator(products,8)
-    page=paginator.page(page_input)
-    products=page.object_list
+    products = Product.objects.all().annotate(avg_star=Avg('reviews__star_count'))
 
-    return render(request,'product-list.html',{
-        'products':products,
-        'paginator':paginator,
-        'page':page,
+    search_input = request.GET.get('search')
+
+    if search_input:
+        products = products.filter(title__icontains=search_input)
+
+    sorting_input = request.GET.get('sorting')
+    if sorting_input:
+        products = products.order_by(sorting_input)
+
+    # Apply the ProductFilter before paginating
+    product_filter = ProductFilter(request.GET, queryset=products)
+    products = product_filter.qs
+
+    page_by_input = int(request.GET.get('page_by', 3))
+    page_input = int(request.GET.get('page', 1))
+    paginator = Paginator(products, page_by_input)
+
+    try:
+        page = paginator.page(page_input)
+        products = page.object_list
+    except EmptyPage:
+        # Handle the case where the page is out of range (e.g., 9999)
+        page = paginator.page(1)
+        products = page.object_list
+
+    colors = Color.objects.all().annotate(product_count=Count('products'))
+    sizes = Size.objects.all().annotate(product_count=Count('products'))
+
+    return render(request, 'product-list.html', {
+        'products': products,
+        'paginator': paginator,
+        'page': page,
+        'sizes': sizes,
+        'colors': colors,
     })
 
 

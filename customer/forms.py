@@ -1,7 +1,7 @@
 from django import forms
 from .models import Customer
 from django.contrib.auth.models import User
-
+from django.utils.translation import gettext_lazy as _
 
 
 
@@ -20,7 +20,7 @@ class RegisterForm(forms.Form):
         password2 = cleaned_data.get('password2')
         
         if password and password2 and password != password2:
-            raise forms.ValidationError('Sifreler eyni deyil!')
+            raise forms.ValidationError(_('Sifreler eyni deyil!'))
         
     def clean_email(self):
         email = self.cleaned_data.get('email')
